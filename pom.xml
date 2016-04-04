@@ -14,5 +14,13 @@
             <artifactId>postgresql</artifactId>
             <version>9.4.1208</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+
     </dependencies>
+
 </project>
