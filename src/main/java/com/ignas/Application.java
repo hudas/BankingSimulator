@@ -1,5 +1,6 @@
 package com.ignas;
 
+import com.ignas.simulation.Simulation;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -16,6 +17,6 @@ public class Application {
 
     public static void main(String... args) throws SQLException {
 
-
+        Simulation.define();
     }
 }
