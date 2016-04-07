@@ -8,7 +8,10 @@ import com.j256.ormlite.support.ConnectionSource;
 import org.jfairy.Fairy;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,32 +30,25 @@ public class TaskDefinition implements Runnable {
                     .build();
 
     public static final Integer TASKS = 100000;
+    public static final Integer BACHES = 20;
+    public static final Integer BACH_SIZE = 50000;
+    public static final Integer CLIENTS = 1000;
+    public static final Integer ACCOUNTS = 5000;
 
 
-    ConnectionSource connectionSource;
     List<PredefinedClient> clientList = new ArrayList();
     List<PredefinedAccount> accountList = new ArrayList();
+
     private Map<PredefinedTask.TaskType, Range<Integer>> numbericRanges = new HashMap<PredefinedTask.TaskType, Range<Integer>>();
     Fairy fairy;
 
-    public TaskDefinition(List<PredefinedClient> clientList, List<PredefinedAccount> accountList,
-                          ConnectionSource connectionSource, Fairy fairy) {
+    public TaskDefinition(List<PredefinedClient> clientList, List<PredefinedAccount> accountList, Fairy fairy) {
         this.clientList = clientList;
         this.accountList = accountList;
-        this.connectionSource = connectionSource;
         this.fairy = fairy;
     }
 
     public void run() {
-        Dao<PredefinedTask, String> taskDao = null;
-        try {
-            taskDao = DaoManager.createDao(connectionSource, PredefinedTask.class);
-        } catch (SQLException e) {
-            System.out.println("Fucked up");
-        }
-
-        long startTime = System.currentTimeMillis();
-
         numbericRanges = new HashMap<PredefinedTask.TaskType, Range<Integer>>();
         Integer previousUpperBound = 0;
         for (PredefinedTask.TaskType type : typeDeviation.keySet()) {
@@ -60,23 +56,42 @@ public class TaskDefinition implements Runnable {
             previousUpperBound +=  typeDeviation.get(type);
         }
 
+        Connection connection = null;
+        System.out.println("Starting Thread:");
+        long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < TASKS; i++) {
-            PredefinedTask.TaskType type = selectTaskType(fairy);
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/simulation_data", "postgres", "postgres");
+            connection.setAutoCommit(false);
 
-            String debitFrom = accountList.get(fairy.baseProducer().randomBetween(0, 1000 - 1)).getAccountNumber();
-            String creditTo = accountList.get(fairy.baseProducer().randomBetween(0, 1000 - 1)).getAccountNumber();
-            BigDecimal amount = BigDecimal.valueOf(fairy.baseProducer().randomBetween(0, 100));
-            PredefinedTask task = new PredefinedTask(type, debitFrom, creditTo, amount);
-            try {
-                taskDao.create(task);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            for (int j = 0; j < BACHES; j++) {
+                Statement stmt = connection.createStatement();
+                for (int i = 0; i < BACH_SIZE; i++) {
+                    PredefinedTask.TaskType type = selectTaskType(fairy);
+
+                    String debitFrom = accountList.get(fairy.baseProducer().randomBetween(0, ACCOUNTS - 1)).getAccountNumber();
+                    String creditTo = accountList.get(fairy.baseProducer().randomBetween(0, ACCOUNTS - 1)).getAccountNumber();
+                    BigDecimal amount = BigDecimal.valueOf(fairy.baseProducer().randomBetween(0, 100));
+
+                    String SQL = "INSERT INTO predefined_task_2(task_id, debit_from, credit_to, amount, type)" +
+                            " VALUES (nextval('task_id_seq'), '" + debitFrom + "', '" + creditTo + "', " + amount + ", '" + type.name() + "')";
+                    // Create statement object
+
+                    stmt.addBatch(SQL);
+                }
+                stmt.executeBatch();
+                connection.commit();
             }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("Uzduotys sugeneruotos, uztruko: " + (endTime-startTime));
+        System.out.println("Uzduotys sugeneruotos, gija uztruko: " + (endTime-startTime));
 
     }
 
