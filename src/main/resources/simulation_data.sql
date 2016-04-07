@@ -15,11 +15,11 @@ CREATE TABLE predefined_account (
 );
 
 CREATE TABLE predefined_task (
-  task_id BIGINT PRIMARY KEY,
+  task_id BIGINT,
   type VARCHAR(32),
   debit_from VARCHAR(32),
   credit_to VARCHAR(32),
-  amount DECIMAL(10, 4) NOT NULL
+  amount DECIMAL(10, 4)
 );
 
 CREATE SEQUENCE account_id_seq;
