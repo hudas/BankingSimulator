@@ -1,16 +1,15 @@
-package com.ignas.simulation;
+package com.ignas.iot.banking.simulation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.support.ConnectionSource;
 import org.jfairy.Fairy;
+import org.postgresql.copy.CopyIn;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,19 +29,19 @@ public class TaskDefinition implements Runnable {
                     .build();
 
     public static final Integer TASKS = 100000;
-    public static final Integer BACHES = 20;
-    public static final Integer BACH_SIZE = 50000;
+    public static final Integer BACHES = 1000;
+    public static final Integer BACH_SIZE = 10000;
     public static final Integer CLIENTS = 1000;
     public static final Integer ACCOUNTS = 5000;
 
 
-    List<PredefinedClient> clientList = new ArrayList();
+    List<PredefinedPatient> clientList = new ArrayList();
     List<PredefinedAccount> accountList = new ArrayList();
 
     private Map<PredefinedTask.TaskType, Range<Integer>> numbericRanges = new HashMap<PredefinedTask.TaskType, Range<Integer>>();
     Fairy fairy;
 
-    public TaskDefinition(List<PredefinedClient> clientList, List<PredefinedAccount> accountList, Fairy fairy) {
+    public TaskDefinition(List<PredefinedPatient> clientList, List<PredefinedAccount> accountList, Fairy fairy) {
         this.clientList = clientList;
         this.accountList = accountList;
         this.fairy = fairy;
@@ -67,6 +66,10 @@ public class TaskDefinition implements Runnable {
 
             for (int j = 0; j < BACHES; j++) {
                 Statement stmt = connection.createStatement();
+                StringBuilder builder = new StringBuilder();
+                CopyManager cm = new CopyManager((BaseConnection) connection);
+                CopyIn cpIN = cm.copyIn("COPY predefined_task_2(debit_from, credit_to, amount, type) FROM STDIN WITH DELIMITER '|'");
+
                 for (int i = 0; i < BACH_SIZE; i++) {
                     PredefinedTask.TaskType type = selectTaskType(fairy);
 
@@ -74,13 +77,31 @@ public class TaskDefinition implements Runnable {
                     String creditTo = accountList.get(fairy.baseProducer().randomBetween(0, ACCOUNTS - 1)).getAccountNumber();
                     BigDecimal amount = BigDecimal.valueOf(fairy.baseProducer().randomBetween(0, 100));
 
-                    String SQL = "INSERT INTO predefined_task_2(task_id, debit_from, credit_to, amount, type)" +
-                            " VALUES (nextval('task_id_seq'), '" + debitFrom + "', '" + creditTo + "', " + amount + ", '" + type.name() + "')";
-                    // Create statement object
 
-                    stmt.addBatch(SQL);
+
+                    builder.append(debitFrom);
+                    builder.append("|");
+                    builder.append(creditTo);
+                    builder.append("|");
+                    builder.append(amount);
+                    builder.append("|\n");
+
+
+
+
+
+//                    String SQL = "INSERT INTO predefined_task_2(debit_from, credit_to, amount, type)" +
+//                            " VALUES ('" + debitFrom + "', '" + creditTo + "', " + amount + ", '" + type.name() + "')";
+//                    // Create statement object
+//
+//                    stmt.addBatch(SQL);
                 }
-                stmt.executeBatch();
+
+                cpIN.writeToCopy(builder.toString().getBytes(), 0, builder.length());
+                cpIN.endCopy();
+
+
+//                stmt.executeBatch();
                 connection.commit();
             }
 

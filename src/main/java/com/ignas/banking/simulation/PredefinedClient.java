@@ -1,4 +1,4 @@
-package com.ignas.simulation;
+package com.ignas.banking.simulation;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -49,7 +49,7 @@ public class PredefinedClient {
 
     @Override
     public String toString() {
-        return "PredefinedClient{clientName='" + clientName + '\'' +
+        return "PredefinedPatient{clientName='" + clientName + '\'' +
                 ", clientSurname='" + clientSurname + '\'' +
                 ", clientCode='" + clientCode + '\'' +
                 '}';

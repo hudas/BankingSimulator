@@ -1,13 +1,10 @@
-package com.ignas.simulation;
+package com.ignas.banking.simulation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
-import com.ignas.banking.DataAccessException;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.jdbc.JdbcDatabaseConnection;
-import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 import org.jfairy.Fairy;
 import org.jfairy.producer.payment.IBAN;
@@ -17,7 +14,6 @@ import org.jfairy.producer.person.Person;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 /**
  * Created by ignas on 4/5/16.
@@ -34,7 +30,7 @@ public class Simulation {
 
     private static Map<PredefinedTask.TaskType, Range<Integer>> numbericRanges = new HashMap<PredefinedTask.TaskType, Range<Integer>>();
 
-    public static final int Threads = 5;
+    public static final int Threads = 10;
     public static final Integer CLIENTS = 1000;
     public static final Integer ACCOUNTS = 5000;
     public static final Integer TASKS = 1000000;
