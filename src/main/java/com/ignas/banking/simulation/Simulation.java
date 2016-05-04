@@ -93,16 +93,5 @@ public class Simulation {
 
 
     }
-
-    private static PredefinedTask.TaskType selectTaskType(Fairy fairy) {
-        Integer typeSelector = fairy.baseProducer().randomBetween(0, 99);
-        for(PredefinedTask.TaskType type : numbericRanges.keySet()) {
-            if (numbericRanges.get(type).contains(typeSelector)) {
-                return type;
-            };
-        }
-
-        throw new IllegalArgumentException("Generated value not between [0; 100] " + typeSelector);
-    }
 }
 

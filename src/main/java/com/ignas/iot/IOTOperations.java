@@ -1,4 +1,4 @@
-package com.ignas.iot.banking;
+package com.ignas.iot;
 
 import java.math.BigDecimal;
 

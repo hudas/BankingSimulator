@@ -1,4 +1,4 @@
-package com.ignas.iot.banking.simulation;
+package com.ignas.iot.simulation;
 
 
 import com.j256.ormlite.field.DataType;

@@ -1,17 +1,12 @@
-package com.ignas.iot.banking.simulation;
+package com.ignas.iot.simulation;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.ignas.iot.banking.DataAccessException;
-import com.ignas.iot.banking.IOTOperations;
-import com.ignas.iot.banking.JDBCIOT;
-import com.ignas.iot.banking.OperationsFactory;
+import com.ignas.iot.DataAccessException;
+import com.ignas.iot.IOTOperations;
+import com.ignas.iot.OperationsFactory;
 import org.jfairy.Fairy;
-import org.jfairy.producer.payment.IBAN;
-import org.jfairy.producer.payment.IBANProvider;
 import org.jfairy.producer.person.Person;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -31,13 +26,13 @@ public class IOTSimulation {
 
     public static final Integer PATIENTS = 1000;
 
-    public static final Integer INSERT_CONDITION_FREQ = 0;
+    public static final Integer INSERT_CONDITION_FREQ = 10;
 //    public static final Integer FIND_LATEST_FREQ = 10;
-    public static final Integer FIND_LATEST_FREQ = 10;
+    public static final Integer FIND_LATEST_FREQ = 0;
 
     public static final int Threads = 10;
 
-    public static final Integer WORK_ITERATIONS = 10000;
+    public static final Integer WORK_ITERATIONS = 100000;
 
     public static final Integer MIN_HEART_RATE = 40;
     public static final Integer MAX_HEAR_RATE = 140;
@@ -58,6 +53,24 @@ public class IOTSimulation {
         }
     }
 
+    public static IOTSimulation ofMongo() {
+        try {
+            return new IOTSimulation(OperationsFactory.mongo());
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static IOTSimulation ofPostgres() {
+        try {
+            return new IOTSimulation(OperationsFactory.postgres());
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private IOTSimulation(IOTOperations operations) {
         this.operations = operations;
     }
@@ -65,16 +78,12 @@ public class IOTSimulation {
     public void run() throws SQLException {
         Fairy fairy = Fairy.create(Locale.ENGLISH);
 
-        List<PredefinedPatient> clientList = new ArrayList();
-
         long startTime = System.currentTimeMillis();
-
-        for (int index = 0; index < PATIENTS; index ++) {
-            Person person = fairy.person();
-            PredefinedPatient client = new PredefinedPatient(new Long(index), person.firstName(), person.lastName());
-            operations.insertPatient(client.getName(), client.getSurname(), client.getPatientId());
-            clientList.add(client);
-        }
+//
+//        for (int index = 0; index < PATIENTS; index ++) {
+//            Person person = fairy.person();
+//            operations.insertPatient(person.firstName(), person.lastName(), new Long(index));
+//        }
 
         long endTime = System.currentTimeMillis();
         System.out.println("Klientai sugeneruoti, užtruko: " + (endTime-startTime));

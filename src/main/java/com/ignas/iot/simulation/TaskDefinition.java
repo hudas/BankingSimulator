@@ -1,4 +1,4 @@
-package com.ignas.iot.banking.simulation;
+package com.ignas.iot.simulation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;

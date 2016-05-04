@@ -1,8 +1,6 @@
 package com.ignas;
 
-import com.ignas.banking.simulation.Simulation;
-import com.ignas.iot.banking.JDBCIOT;
-import com.ignas.iot.banking.simulation.IOTSimulation;
+import com.ignas.iot.simulation.IOTSimulation;
 
 import java.sql.SQLException;
 
@@ -12,6 +10,8 @@ import java.sql.SQLException;
 public class Application {
 
     public static void main(String... args) throws SQLException {
-        IOTSimulation.ofVolt().run();
+        //IOTSimulation.ofVolt().run();
+        //IOTSimulation.ofMongo().run();
+        IOTSimulation.ofPostgres().run();
     }
 }

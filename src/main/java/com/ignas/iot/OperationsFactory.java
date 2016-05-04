@@ -1,4 +1,4 @@
-package com.ignas.iot.banking;
+package com.ignas.iot;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,14 +11,14 @@ public class OperationsFactory {
 
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "postgres");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/simulation_data", "postgres", "postgres");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             throw new DataAccessException();
         }
 
-        return new JDBCIOT(connection);
+        return new VoltIOT(connection);
     }
 
     public static IOTOperations volt() throws DataAccessException {
@@ -33,7 +33,7 @@ public class OperationsFactory {
             throw new DataAccessException();
         }
 
-        return new JDBCIOT(connection);
+        return new VoltIOT(connection);
     }
 
     public static IOTOperations mongo() throws DataAccessException {

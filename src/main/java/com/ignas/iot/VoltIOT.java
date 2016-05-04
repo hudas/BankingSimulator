@@ -1,6 +1,5 @@
-package com.ignas.iot.banking;
+package com.ignas.iot;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,23 +8,22 @@ import java.sql.SQLException;
 /**
  * Created by ignas on 4/3/16.
  */
-public class JDBCIOT implements IOTOperations {
+public class VoltIOT implements IOTOperations {
 
     private Connection connection;
 
-    public JDBCIOT(Connection connection) {
+    public VoltIOT(Connection connection) {
         this.connection = connection;
     }
 
     public void insertCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
-            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?, ?)}");
+            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?)}");
             callable.setLong(1, patientId);
-            callable.setLong(2, conditionId);
-            callable.setLong(3, bloodPressure);
-            callable.setLong(4, heartRate);
-            callable.setLong(5, bodyTemperature);
+            callable.setLong(2, bloodPressure);
+            callable.setLong(3, heartRate);
+            callable.setLong(4, bodyTemperature);
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
