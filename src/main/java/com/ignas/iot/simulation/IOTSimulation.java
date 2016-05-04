@@ -90,7 +90,7 @@ public class IOTSimulation {
 
         startTime = System.currentTimeMillis();
 
-        Long logCount = 0L;
+        Long logCount = 1000000L;
 
         List<PredefinedAccount> accountList = new ArrayList<PredefinedAccount>();
         for (int i = 0; i < WORK_ITERATIONS; i++) {

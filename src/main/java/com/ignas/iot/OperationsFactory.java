@@ -18,7 +18,7 @@ public class OperationsFactory {
             throw new DataAccessException();
         }
 
-        return new VoltIOT(connection);
+        return new PostgresIOT(connection);
     }
 
     public static IOTOperations volt() throws DataAccessException {
