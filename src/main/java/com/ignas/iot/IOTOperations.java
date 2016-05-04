@@ -7,8 +7,17 @@ import java.math.BigDecimal;
  */
 public interface IOTOperations {
 
-    // OLTP Operations
-    void insertCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);
+    // management
+    void removeOldData(long maxConditionId);
+    void removeAllData();
     void insertPatient(String name, String surname, Long patientId);
+
+    // First
+    void insertRawCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);
     void getLatestCondition(long patientId);
+
+    // Second
+    void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);
+    void getLatestConditionStats(long patientId);
+    void getDailyConditionStats();
 }

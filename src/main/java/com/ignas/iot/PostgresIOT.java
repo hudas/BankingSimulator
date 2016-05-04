@@ -1,9 +1,6 @@
 package com.ignas.iot;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Created by ignas on 4/3/16.
@@ -16,7 +13,7 @@ public class PostgresIOT implements IOTOperations {
         this.connection = connection;
     }
 
-    public void insertCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
+    public void insertRawCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
             callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?)}");
@@ -27,7 +24,7 @@ public class PostgresIOT implements IOTOperations {
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to Log patient condition");
         }
     }
 
@@ -41,7 +38,7 @@ public class PostgresIOT implements IOTOperations {
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to insert new Patient");
         }
     }
 
@@ -54,7 +51,72 @@ public class PostgresIOT implements IOTOperations {
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
+        }
+    }
+
+    public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
+        CallableStatement callable = null;
+        try {
+            callable = connection.prepareCall("{call InsertConditionStats(?, ?, ?, ?)}");
+            callable.setLong(1, patientId);
+            callable.setLong(2, bloodPressure);
+            callable.setLong(3, heartRate);
+            callable.setLong(4, bodyTemperature);
+            callable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to Log patient condition");
+        }
+    }
+
+    public void getLatestConditionStats(long patientId) {
+        CallableStatement callable = null;
+        ResultSet resultSet = null;
+        try {
+            callable = connection.prepareCall("{call FindLatestConditionStats(?)}");
+            callable.setLong(1, patientId);
+            resultSet = callable.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
+        }
+    }
+
+    public void getDailyConditionStats() {
+        CallableStatement callable = null;
+        ResultSet resultSet = null;
+        try {
+            callable = connection.prepareCall("{call DailyConditionStats()}");
+            resultSet = callable.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to get Daily stats:");
+        }
+    }
+
+    public void removeOldData(long maxConditionId) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > ?");
+            statement.setLong(1, maxConditionId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to Remove Old Data");
+        }
+    }
+
+    public void removeAllData() {
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log");
+            statement.executeUpdate();
+            statement = connection.prepareStatement("DELETE FROM hospital_patient");
+            statement.executeUpdate();
+            statement = connection.prepareStatement("DELETE FROM patient_stats");
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to Remove Old Data");
         }
     }
 }

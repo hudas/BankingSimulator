@@ -20,3 +20,24 @@ CREATE TABLE HOSPITAL_PATIENT (
 );
 PARTITION TABLE HOSPITAL_PATIENT ON COLUMN PATIENT_ID;
 
+CREATE TABLE patient_stats (
+   patient_id bigint NOT NULL,
+   tmp_pressure_sum bigint not null,
+   pressure_min bigint not null,
+   pressure_max BIGINT not null,
+
+   tmp_rate_sum BIGINT not null,
+   rate_min bigint not null,
+   rate_max BIGINT not null,
+
+   tmp_temp_sum BIGINT not null,
+   temp_min bigint not null,
+   temp_max bigint not null,
+
+   measurement_count bigint not null,
+   latest_blood_pressure bigint NOT NULL,
+   latest_heart_rate bigint NOT NULL,
+   latest_body_temperature bigint NOT NULL,
+   PRIMARY KEY (PATIENT_ID)
+);
+

@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 
 public class OperationsFactory {
 
-    public static IOTOperations postgres() throws DataAccessException {
+    public static IOTOperations postgres() {
         Connection connection;
 
         try {
@@ -15,13 +15,13 @@ public class OperationsFactory {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
-            throw new DataAccessException();
+           return null;
         }
 
         return new PostgresIOT(connection);
     }
 
-    public static IOTOperations volt() throws DataAccessException {
+    public static IOTOperations volt() {
         Connection connection;
 
         try {
@@ -30,13 +30,13 @@ public class OperationsFactory {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
-            throw new DataAccessException();
+            return null;
         }
 
         return new VoltIOT(connection);
     }
 
-    public static IOTOperations mongo() throws DataAccessException {
+    public static IOTOperations mongo() {
         return new MongoIOT();
     }
 
