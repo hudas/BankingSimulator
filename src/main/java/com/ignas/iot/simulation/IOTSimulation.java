@@ -15,25 +15,22 @@ public class IOTSimulation {
 
     private IOTOperations operations;
 
-    private static final ImmutableMap<PredefinedTask.TaskType, Integer> typeDeviation =
-            ImmutableMap.<PredefinedTask.TaskType, Integer>builder()
-                    .put(PredefinedTask.TaskType.ADD, 10)
-                    .put(PredefinedTask.TaskType.WITHDRAW, 10)
-                    .put(PredefinedTask.TaskType.TRANSFER, 80)
-                    .build();
-
+    // Simulation Definition
     public static final Integer PATIENTS = 1000;
-
-    public static final Integer INSERT_CONDITION_FREQ = 10;
-    public static final Integer FIND_LATEST_FREQ = 1;
-    public static final Integer INSERT_COND_STAT_FREQ = 1;
-    public static final Integer FIND_LATEST_STAT_FREQ = 1;
-    public static final Integer DAILY_COND_STAT_FREQ = 1;
-
-
     public static final Integer PREPARED_CONDITIONS = 100000;
 
-    public static final Integer WORK_ITERATIONS = 1;
+
+    public static final Integer THREAD_COUNT = 500;
+    public static final Integer WORK_ITERATIONS = 200;
+
+    public static final Integer INSERT_CONDITION_FREQ = 10;
+    public static final Integer FIND_LATEST_FREQ = 0;
+    public static final Integer INSERT_COND_STAT_FREQ = 0;
+    public static final Integer FIND_LATEST_STAT_FREQ = 0;
+    public static final Integer DAILY_COND_STAT_FREQ = 0;
+
+
+    // Business Rules
 
     public static final Integer MIN_HEART_RATE = 40;
     public static final Integer MAX_HEAR_RATE = 140;
@@ -43,6 +40,12 @@ public class IOTSimulation {
 
     public static final Integer MIN_BODY_TEMP = 34;
     public static final Integer MAX_BODY_TEMP = 42;
+
+    private volatile Integer logCount = PREPARED_CONDITIONS;
+    private volatile long endTime;
+    private volatile int finished = 0;
+    private long start;
+
 
     public IOTSimulation(IOTOperations operations) {
         this.operations = operations;
@@ -75,41 +78,57 @@ public class IOTSimulation {
 
     public void run() throws SQLException {
         System.out.println("Removing last run Data");
-    //    operations.removeOldData(PREPARED_CONDITIONS);
+        operations.removeOldData(PREPARED_CONDITIONS);
         System.out.println("Data removed");
 
-
         Fairy fairy = Fairy.create(Locale.ENGLISH);
-        Integer logCount = PREPARED_CONDITIONS;
 
-        long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < WORK_ITERATIONS; i++) {
+        start = System.currentTimeMillis();
+        System.out.println("Starting Simulation on Threads: " + THREAD_COUNT + " ON: " + start);
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            new Thread(new ThreadedSimulation(fairy)).start();
+        }
+    }
 
-            for(int j = 0; j < INSERT_CONDITION_FREQ; j++) {
-                insertRandomCondition(fairy, logCount);
-            }
+    public class ThreadedSimulation implements Runnable {
 
-            for(int j = 0; j < FIND_LATEST_FREQ; j++) {
-                 operations.getLatestCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
-            }
+        private Fairy fairy;
 
-            for(int j = 0; j < INSERT_COND_STAT_FREQ; j++) {
-                insertRandomConditionStat(fairy, logCount);
-            }
-
-            for(int j = 0; j < FIND_LATEST_STAT_FREQ; j++) {
-                operations.getLatestConditionStats(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
-            }
-
-            for(int j = 0; j < DAILY_COND_STAT_FREQ; j++) {
-                operations.getDailyConditionStats();
-            }
+        public ThreadedSimulation(Fairy fairy) {
+            this.fairy = fairy;
         }
 
-        long endTime = System.currentTimeMillis();
+        public void run() {
+            for (int i = 0; i < WORK_ITERATIONS; i++) {
 
-        System.out.println("Saskaitos sugeneruotos, uztruko: " + (endTime-startTime));
+                for(int j = 0; j < INSERT_CONDITION_FREQ; j++) {
+                    insertRandomCondition(fairy, logCount);
+                }
+
+                for(int j = 0; j < FIND_LATEST_FREQ; j++) {
+                    operations.getLatestCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
+                }
+
+                for(int j = 0; j < INSERT_COND_STAT_FREQ; j++) {
+                    insertRandomConditionStat(fairy, logCount);
+                }
+
+                for(int j = 0; j < FIND_LATEST_STAT_FREQ; j++) {
+                    operations.getLatestConditionStats(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
+                }
+
+                for(int j = 0; j < DAILY_COND_STAT_FREQ; j++) {
+                    operations.getDailyConditionStats();
+                }
+            }
+            finished++;
+            if (finished == THREAD_COUNT) {
+                endTime = System.currentTimeMillis();
+                System.out.println("Gija : " + Thread.currentThread().getName() + " Baigė darbą: " + endTime);
+                System.out.println("Užtruko: " + (endTime - start));
+            }
+        }
     }
 
     private void insertRandomCondition(Fairy fairy, Integer conditionId) {

@@ -187,8 +187,7 @@ class MongoIOT implements IOTOperations {
     }
 
     public void removeOldData(long maxConditionId) {
-        MongoCollection table = db.getCollection("condition_log");
-        table.deleteMany(Filters.gt("condigion_id", maxConditionId));
+        db.getCollection("condition_log").deleteMany(new Document());
     }
 
     public void removeAllData() {
