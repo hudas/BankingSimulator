@@ -2,6 +2,7 @@ package com.ignas.iot.simulation;
 
 import com.google.common.collect.ImmutableMap;
 import com.ignas.iot.IOTOperations;
+import com.ignas.iot.OperationsFactory;
 import org.jfairy.Fairy;
 import org.jfairy.producer.person.Person;
 
@@ -20,9 +21,11 @@ public class IOTSimulation {
     public static final Integer PREPARED_CONDITIONS = 10000;
 
 
-    public static final Integer THREAD_COUNT = 50;
-    public static final Integer WORK_ITERATIONS = 100;
+    public static final Integer THREAD_COUNT = 2;
+    public static final Integer WORK_ITERATIONS = 5000;
 
+
+    // Must Be 100proc
     public static final Integer INSERT_CONDITION_FREQ = 100;
     public static final Integer FIND_LATEST_FREQ = 0;
     public static final Integer INSERT_COND_STAT_FREQ = 0;
@@ -77,9 +80,9 @@ public class IOTSimulation {
 
 
     public void run() throws SQLException {
-//        System.out.println("Removing last run Data");
-//        operations.removeOldData(PREPARED_CONDITIONS);
-//        System.out.println("Data removed");
+        System.out.println("Removing last run Data");
+        operations.removeOldData(PREPARED_CONDITIONS);
+        System.out.println("Data removed");
 
         Fairy fairy = Fairy.create(Locale.ENGLISH);
 
@@ -87,18 +90,20 @@ public class IOTSimulation {
         start = System.currentTimeMillis();
         System.out.println("Starting Simulation on Threads: " + THREAD_COUNT + " ON: " + start);
         for (int i = 0; i < THREAD_COUNT; i++) {
-            new Thread(new ThreadedSimulation(fairy, i)).start();
+            new Thread(new ThreadedSimulation(fairy, i, OperationsFactory.postgres())).start();
         }
     }
 
     public class ThreadedSimulation implements Runnable {
 
+        private IOTOperations operationsConn;
         private Fairy fairy;
         private Integer threadNum;
 
-        public ThreadedSimulation(Fairy fairy, Integer threadNum) {
+        public ThreadedSimulation(Fairy fairy, Integer threadNum, IOTOperations operations) {
             this.fairy = fairy;
             this.threadNum = threadNum;
+            this.operationsConn = operations;
         }
 
         public void run() {
@@ -110,7 +115,7 @@ public class IOTSimulation {
                 }
 
                 for(int j = 0; j < FIND_LATEST_FREQ; j++) {
-                    operations.getLatestCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
+                    operationsConn.getLatestCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
                 }
 
                 for(int j = 0; j < INSERT_COND_STAT_FREQ; j++) {
@@ -118,17 +123,35 @@ public class IOTSimulation {
                 }
 
                 for(int j = 0; j < FIND_LATEST_STAT_FREQ; j++) {
-                    operations.getLatestConditionStats(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
+                    operationsConn.getLatestConditionStats(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
                 }
 
                 for(int j = 0; j < DAILY_COND_STAT_FREQ; j++) {
-                    operations.getDailyConditionStats();
+                    operationsConn.getDailyConditionStats();
                 }
             }
 
             endTime = System.currentTimeMillis();
             System.out.println("Gija : " + Thread.currentThread().getName() + " Baigė darbą: " + endTime);
             System.out.println("Užtruko: " + (endTime - start));
+        }
+
+        private void insertRandomCondition(Fairy fairy, Integer conditionId) {
+            Integer selectedPatient = fairy.baseProducer().randomBetween(0, PATIENTS - 1);
+            Integer pressure = fairy.baseProducer().randomBetween(MIN_BLOOD_PRESSURE, MAX_BLOOD_PRESSURE);
+            Integer rate = fairy.baseProducer().randomBetween(MIN_HEART_RATE, MAX_HEAR_RATE);
+            Integer temperature = fairy.baseProducer().randomBetween(MIN_BODY_TEMP, MAX_BODY_TEMP);
+
+            operationsConn.insertRawCondition(selectedPatient, conditionId, pressure, rate, temperature);
+        }
+
+        private void insertRandomConditionStat(Fairy fairy, Integer conditionId) {
+            Integer selectedPatient = fairy.baseProducer().randomBetween(0, PATIENTS - 1);
+            Integer pressure = fairy.baseProducer().randomBetween(MIN_BLOOD_PRESSURE, MAX_BLOOD_PRESSURE);
+            Integer rate = fairy.baseProducer().randomBetween(MIN_HEART_RATE, MAX_HEAR_RATE);
+            Integer temperature = fairy.baseProducer().randomBetween(MIN_BODY_TEMP, MAX_BODY_TEMP);
+
+            operationsConn.insertConditionWithStats(selectedPatient, conditionId, pressure, rate, temperature);
         }
     }
 
@@ -141,13 +164,5 @@ public class IOTSimulation {
         operations.insertRawCondition(selectedPatient, conditionId, pressure, rate, temperature);
     }
 
-    private void insertRandomConditionStat(Fairy fairy, Integer conditionId) {
-        Integer selectedPatient = fairy.baseProducer().randomBetween(0, PATIENTS - 1);
-        Integer pressure = fairy.baseProducer().randomBetween(MIN_BLOOD_PRESSURE, MAX_BLOOD_PRESSURE);
-        Integer rate = fairy.baseProducer().randomBetween(MIN_HEART_RATE, MAX_HEAR_RATE);
-        Integer temperature = fairy.baseProducer().randomBetween(MIN_BODY_TEMP, MAX_BODY_TEMP);
-
-        operations.insertConditionWithStats(selectedPatient, conditionId, pressure, rate, temperature);
-    }
 }
 
