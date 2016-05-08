@@ -17,13 +17,13 @@ public class IOTSimulation {
 
     // Simulation Definition
     public static final Integer PATIENTS = 1000;
-    public static final Integer PREPARED_CONDITIONS = 100000;
+    public static final Integer PREPARED_CONDITIONS = 10000;
 
 
-    public static final Integer THREAD_COUNT = 500;
-    public static final Integer WORK_ITERATIONS = 200;
+    public static final Integer THREAD_COUNT = 50;
+    public static final Integer WORK_ITERATIONS = 100;
 
-    public static final Integer INSERT_CONDITION_FREQ = 10;
+    public static final Integer INSERT_CONDITION_FREQ = 100;
     public static final Integer FIND_LATEST_FREQ = 0;
     public static final Integer INSERT_COND_STAT_FREQ = 0;
     public static final Integer FIND_LATEST_STAT_FREQ = 0;
@@ -77,9 +77,9 @@ public class IOTSimulation {
 
 
     public void run() throws SQLException {
-        System.out.println("Removing last run Data");
-        operations.removeOldData(PREPARED_CONDITIONS);
-        System.out.println("Data removed");
+//        System.out.println("Removing last run Data");
+//        operations.removeOldData(PREPARED_CONDITIONS);
+//        System.out.println("Data removed");
 
         Fairy fairy = Fairy.create(Locale.ENGLISH);
 
@@ -87,23 +87,26 @@ public class IOTSimulation {
         start = System.currentTimeMillis();
         System.out.println("Starting Simulation on Threads: " + THREAD_COUNT + " ON: " + start);
         for (int i = 0; i < THREAD_COUNT; i++) {
-            new Thread(new ThreadedSimulation(fairy)).start();
+            new Thread(new ThreadedSimulation(fairy, i)).start();
         }
     }
 
     public class ThreadedSimulation implements Runnable {
 
         private Fairy fairy;
+        private Integer threadNum;
 
-        public ThreadedSimulation(Fairy fairy) {
+        public ThreadedSimulation(Fairy fairy, Integer threadNum) {
             this.fairy = fairy;
+            this.threadNum = threadNum;
         }
 
         public void run() {
+            int count = 0;
             for (int i = 0; i < WORK_ITERATIONS; i++) {
 
                 for(int j = 0; j < INSERT_CONDITION_FREQ; j++) {
-                    insertRandomCondition(fairy, logCount);
+                    insertRandomCondition(fairy, 280000000 + WORK_ITERATIONS*INSERT_CONDITION_FREQ*threadNum + count++);
                 }
 
                 for(int j = 0; j < FIND_LATEST_FREQ; j++) {
@@ -122,12 +125,10 @@ public class IOTSimulation {
                     operations.getDailyConditionStats();
                 }
             }
-            finished++;
-            if (finished == THREAD_COUNT) {
-                endTime = System.currentTimeMillis();
-                System.out.println("Gija : " + Thread.currentThread().getName() + " Baigė darbą: " + endTime);
-                System.out.println("Užtruko: " + (endTime - start));
-            }
+
+            endTime = System.currentTimeMillis();
+            System.out.println("Gija : " + Thread.currentThread().getName() + " Baigė darbą: " + endTime);
+            System.out.println("Užtruko: " + (endTime - start));
         }
     }
 
