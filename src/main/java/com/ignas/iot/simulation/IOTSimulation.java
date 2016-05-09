@@ -18,22 +18,23 @@ public class IOTSimulation {
 
     // Simulation Definition
     public static final Integer PATIENTS = 1000;
-    public static final Integer PREPARED_CONDITIONS = 10000;
+    public static final Integer PREPARED_CONDITIONS = 0;
 
 
-    public static final Integer THREAD_COUNT = 2;
-    public static final Integer WORK_ITERATIONS = 5000;
+    public static final Integer THREAD_COUNT = 50;
+    public static final Integer WORK_ITERATIONS = 200;
 
 
     // Must Be 100proc
-    public static final Integer INSERT_CONDITION_FREQ = 100;
+    public static final Integer INSERT_CONDITION_FREQ = 0;
     public static final Integer FIND_LATEST_FREQ = 0;
-    public static final Integer INSERT_COND_STAT_FREQ = 0;
+    public static final Integer INSERT_COND_STAT_FREQ = 100;
     public static final Integer FIND_LATEST_STAT_FREQ = 0;
     public static final Integer DAILY_COND_STAT_FREQ = 0;
+    public static final Integer FIND_LATEST_VIEW_FREQ = 0;
 
 
-    // Business Rules
+    // Business Rules+
 
     public static final Integer MIN_HEART_RATE = 40;
     public static final Integer MAX_HEAR_RATE = 140;
@@ -55,7 +56,7 @@ public class IOTSimulation {
     }
 
     public void define() throws SQLException {
-        operations.removeAllData();
+        //operations.removeAllData();
         Fairy fairy = Fairy.create(Locale.ENGLISH);
 
         long startTime = System.currentTimeMillis();
@@ -80,9 +81,12 @@ public class IOTSimulation {
 
 
     public void run() throws SQLException {
+        start = System.currentTimeMillis();
+
         System.out.println("Removing last run Data");
         operations.removeOldData(PREPARED_CONDITIONS);
-        System.out.println("Data removed");
+        endTime = System.currentTimeMillis();
+        System.out.println("Data removed, took: " + (endTime - start));
 
         Fairy fairy = Fairy.create(Locale.ENGLISH);
 
@@ -90,7 +94,7 @@ public class IOTSimulation {
         start = System.currentTimeMillis();
         System.out.println("Starting Simulation on Threads: " + THREAD_COUNT + " ON: " + start);
         for (int i = 0; i < THREAD_COUNT; i++) {
-            new Thread(new ThreadedSimulation(fairy, i, OperationsFactory.postgres())).start();
+            new Thread(new ThreadedSimulation(fairy, i, OperationsFactory.volt())).start();
         }
     }
 
@@ -111,15 +115,19 @@ public class IOTSimulation {
             for (int i = 0; i < WORK_ITERATIONS; i++) {
 
                 for(int j = 0; j < INSERT_CONDITION_FREQ; j++) {
-                    insertRandomCondition(fairy, 280000000 + WORK_ITERATIONS*INSERT_CONDITION_FREQ*threadNum + count++);
+                    insertRandomCondition(fairy,  10000000 + WORK_ITERATIONS*INSERT_CONDITION_FREQ*threadNum + count++);
                 }
 
                 for(int j = 0; j < FIND_LATEST_FREQ; j++) {
                     operationsConn.getLatestCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
                 }
 
+                for(int j = 0; j < FIND_LATEST_VIEW_FREQ; j++) {
+                    operationsConn.getLatestViewCondition(fairy.baseProducer().randomBetween(0, PATIENTS - 1));
+                }
+
                 for(int j = 0; j < INSERT_COND_STAT_FREQ; j++) {
-                    insertRandomConditionStat(fairy, logCount);
+                    insertRandomConditionStat(fairy, 20000000 + WORK_ITERATIONS*INSERT_COND_STAT_FREQ *threadNum + count++);
                 }
 
                 for(int j = 0; j < FIND_LATEST_STAT_FREQ; j++) {

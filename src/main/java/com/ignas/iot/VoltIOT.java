@@ -56,6 +56,19 @@ public class VoltIOT implements IOTOperations {
         }
     }
 
+    public void getLatestViewCondition(long patientId) {
+        CallableStatement callable = null;
+        ResultSet resultSet = null;
+        try {
+            callable = connection.prepareCall("{call FindLatestConditionView(?)}");
+            callable.setLong(1, patientId);
+            resultSet = callable.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
@@ -99,7 +112,7 @@ public class VoltIOT implements IOTOperations {
 
     public void removeOldData(long maxConditionId) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 14999999");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

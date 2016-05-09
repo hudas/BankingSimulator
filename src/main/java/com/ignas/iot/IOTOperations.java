@@ -15,6 +15,7 @@ public interface IOTOperations {
     // First
     void insertRawCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);
     void getLatestCondition(long patientId);
+    void getLatestViewCondition(long patientId);
 
     // Second
     void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);

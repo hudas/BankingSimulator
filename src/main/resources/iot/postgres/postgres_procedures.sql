@@ -154,6 +154,6 @@ SELECT
   AVG(log.heart_rate) avg_heart_rate, MAX(log.heart_rate) max_heart_rate, MIN(log.heart_rate) min_heart_rate,
   AVG(log.body_temperature) avg_body_temperature, MAX(log.body_temperature) max_body_temperature, MIN(log.body_temperature) min_body_temperature
 FROM condition_log log
-WHERE DATE(log.measurement_time) = DATE(NOW())
+WHERE log.measurement_time >= DATE(NOW()) and log.measurement_time <= DATE(NOW() + INTERVAL '1 DAY')
 GROUP BY log.patient_id;
 $$ language sql;

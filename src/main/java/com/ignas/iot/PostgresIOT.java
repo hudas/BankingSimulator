@@ -55,6 +55,10 @@ public class PostgresIOT implements IOTOperations {
         }
     }
 
+    public void getLatestViewCondition(long patientId) {
+
+    }
+
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
@@ -97,8 +101,7 @@ public class PostgresIOT implements IOTOperations {
 
     public void removeOldData(long maxConditionId) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > ?");
-            statement.setLong(1, maxConditionId);
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 83173336");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
