@@ -21,14 +21,14 @@ public class IOTSimulation {
     public static final Integer PREPARED_CONDITIONS = 0;
 
 
-    public static final Integer THREAD_COUNT = 50;
-    public static final Integer WORK_ITERATIONS = 200;
+    public static final Integer THREAD_COUNT = 5;
+    public static final Integer WORK_ITERATIONS = 1;
 
 
     // Must Be 100proc
-    public static final Integer INSERT_CONDITION_FREQ = 0;
+    public static final Integer INSERT_CONDITION_FREQ = 100;
     public static final Integer FIND_LATEST_FREQ = 0;
-    public static final Integer INSERT_COND_STAT_FREQ = 100;
+    public static final Integer INSERT_COND_STAT_FREQ = 0;
     public static final Integer FIND_LATEST_STAT_FREQ = 0;
     public static final Integer DAILY_COND_STAT_FREQ = 0;
     public static final Integer FIND_LATEST_VIEW_FREQ = 0;
@@ -115,7 +115,7 @@ public class IOTSimulation {
             for (int i = 0; i < WORK_ITERATIONS; i++) {
 
                 for(int j = 0; j < INSERT_CONDITION_FREQ; j++) {
-                    insertRandomCondition(fairy,  10000000 + WORK_ITERATIONS*INSERT_CONDITION_FREQ*threadNum + count++);
+                    insertRandomCondition(fairy,  20000000 + WORK_ITERATIONS*INSERT_CONDITION_FREQ*threadNum + count++);
                 }
 
                 for(int j = 0; j < FIND_LATEST_FREQ; j++) {
