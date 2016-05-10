@@ -15,7 +15,7 @@ public class PropertiesFileReader implements ProvidesConfig {
         InputStream input = null;
 
         try {
-            input = new FileInputStream("src/main/config.properties");
+            input = new FileInputStream("config.properties");
 
             // load a properties file
             prop.load(input);
@@ -33,8 +33,10 @@ public class PropertiesFileReader implements ProvidesConfig {
             Integer dailyCondStatFreq = Integer.parseInt(prop.getProperty("daily_condition_stats.freq"));
             Integer findLatestFromViewFreq = Integer.parseInt(prop.getProperty("find_latest_view.freq"));
 
-            SimulationConfig config = new SimulationConfig(threadCount, workIterations, insertCondFreq, findLatestFreq,
-                    insertCondStatFreq, findLatestStatFreq, dailyCondStatFreq, findLatestFromViewFreq);
+            SimulationConfig config = new SimulationConfig(patientsCount, preparedConditionsCount,
+                    threadCount, workIterations,
+                    insertCondFreq, findLatestFreq, insertCondStatFreq, findLatestStatFreq,
+                    dailyCondStatFreq, findLatestFromViewFreq);
 
 
             input.close();

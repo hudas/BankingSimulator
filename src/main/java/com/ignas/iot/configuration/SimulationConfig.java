@@ -1,9 +1,14 @@
 package com.ignas.iot.configuration;
 
+import com.j256.ormlite.stmt.query.In;
+
 /**
  * Created by ignas on 5/10/16.
  */
 public class SimulationConfig {
+    private Integer patientCount = 100;
+    private Integer predefinedConditions = 1000000;
+
     private Integer threadCount = 5;
     private Integer workIterations = 1;
 
@@ -15,9 +20,12 @@ public class SimulationConfig {
     private Integer dailyCondStatsFreq = 0;
     private Integer findLatestFromViewFreq = 0;
 
-    public SimulationConfig(Integer threadCount, Integer workIterations, Integer insertCondFreq,
+    public SimulationConfig(Integer patientCount, Integer predefinedConditions,
+                            Integer threadCount, Integer workIterations, Integer insertCondFreq,
                             Integer findLatestFreq, Integer insertCondWithStatsFreq, Integer findLatestStatFreq,
                             Integer dailyCondStatsFreq, Integer findLatestFromViewFreq) {
+        this.patientCount = patientCount;
+        this.predefinedConditions = predefinedConditions;
         this.threadCount = threadCount;
         this.workIterations = workIterations;
         this.insertCondFreq = insertCondFreq;
@@ -28,6 +36,13 @@ public class SimulationConfig {
         this.findLatestFromViewFreq = findLatestFromViewFreq;
     }
 
+    public Integer getPatientCount() {
+        return patientCount;
+    }
+
+    public Integer getPredefinedConditions() {
+        return predefinedConditions;
+    }
 
     public Integer getThreadCount() {
         return threadCount;

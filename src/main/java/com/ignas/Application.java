@@ -25,7 +25,7 @@ public class Application {
             throw new RuntimeException("Neegzistuojanti DB! Galimos: (volt, mongo, postgres)");
         }
 
-        Simulation simulation = new Simulation(ops, new PropertiesFileReader().getConfiguration());
+        Simulation simulation = new Simulation(ops, new PropertiesFileReader().getConfiguration(), 0);
 
 
         if (args.length == 2 && args[1] != null && "def".equals(args[1].toLowerCase())) {

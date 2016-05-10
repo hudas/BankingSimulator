@@ -114,7 +114,8 @@ public class Volt implements Operations {
 
     public void removeOldData(long maxConditionId) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 14999999");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > ?");
+            statement.setLong(1, maxConditionId);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -126,8 +127,8 @@ public class Volt implements Operations {
         try {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log");
             statement.executeUpdate();
-            statement = connection.prepareStatement("DELETE FROM hospital_patient");
-            statement.executeUpdate();
+            PreparedStatement other = connection.prepareStatement("DELETE FROM hospital_patient");
+            other.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to Remove Old Data");

@@ -1,7 +1,6 @@
 package com.ignas.iot;
 
 import com.ignas.iot.operations.Operations;
-import com.j256.ormlite.stmt.query.In;
 import org.jfairy.Fairy;
 import org.jfairy.producer.person.Person;
 
@@ -25,13 +24,12 @@ public class OperationService {
     private Integer patients;
     private Operations operations;
     private Fairy dataProvider;
+    private Long offset;
 
-
-
-
-    public OperationService(Operations ops, Integer patients) {
+    public OperationService(Operations ops, Integer patients, Long idOffset) {
         operations = ops;
         dataProvider = Fairy.create(Locale.ENGLISH);
+        offset = idOffset;
         this.patients = patients;
     }
 
@@ -41,12 +39,12 @@ public class OperationService {
     }
 
 
-    public void insertRawCondition() {
+    public void insertRawCondition(long conditionLogId) {
         Integer pressure = dataProvider.baseProducer().randomBetween(MIN_BLOOD_PRESSURE, MAX_BLOOD_PRESSURE);
         Integer rate = dataProvider.baseProducer().randomBetween(MIN_HEART_RATE, MAX_HEAR_RATE);
         Integer temperature = dataProvider.baseProducer().randomBetween(MIN_BODY_TEMP, MAX_BODY_TEMP);
 
-        operations.insertRawCondition(getRandomPatientId(), ++createdConditions, pressure, rate, temperature);
+        operations.insertRawCondition(getRandomPatientId(), offset + conditionLogId, pressure, rate, temperature);
     }
 
     public void getLatestCondition() {
@@ -58,12 +56,12 @@ public class OperationService {
     }
 
 
-    public void insertConditionWithStats() {
+    public void insertConditionWithStats(long conditionLogId) {
         Integer pressure = dataProvider.baseProducer().randomBetween(MIN_BLOOD_PRESSURE, MAX_BLOOD_PRESSURE);
         Integer rate = dataProvider.baseProducer().randomBetween(MIN_HEART_RATE, MAX_HEAR_RATE);
         Integer temperature = dataProvider.baseProducer().randomBetween(MIN_BODY_TEMP, MAX_BODY_TEMP);
 
-        operations.insertConditionWithStats(getRandomPatientId(), ++createdConditions, pressure, rate, temperature);
+        operations.insertConditionWithStats(getRandomPatientId(), offset + conditionLogId, pressure, rate, temperature);
     }
 
     public void getLatestConditionStats() {
@@ -74,8 +72,8 @@ public class OperationService {
         operations.getDailyConditionStats();
     }
 
-    public void removeOldData() {
-        operations.removeOldData(0);
+    public void removeOldData(long preparedCondCount) {
+        operations.removeOldData(preparedCondCount);
     }
 
     public void removeAllData() {

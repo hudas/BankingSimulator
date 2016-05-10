@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 public class OperationsFactory {
 
     private ProvidesOperation provider;
+    private static Operations voltConnection;
 
     private OperationsFactory(ProvidesOperation opsProvider) {
         provider = opsProvider;
@@ -35,20 +36,21 @@ public class OperationsFactory {
     }
 
     public static OperationsFactory volt() {
-        return new OperationsFactory(() -> {
-            Connection connection;
+        Connection connection;
 
-            try {
-                Class.forName("org.voltdb.jdbc.Driver");
-                connection = DriverManager.getConnection("jdbc:voltdb://localhost:7002");
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println(e.getClass().getName()+": "+e.getMessage());
-                return null;
-            }
+        try {
+            Class.forName("org.voltdb.jdbc.Driver");
+            connection = DriverManager.getConnection("jdbc:voltdb://localhost:7002");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+            return null;
+        }
 
-            return new Volt(connection);
-        });
+        voltConnection = new Volt(connection);
+        return new OperationsFactory(() ->
+            voltConnection
+        );
     }
 
     public static OperationsFactory mongo() {
