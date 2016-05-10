@@ -1,31 +1,32 @@
-package com.ignas.iot;
+package com.ignas.iot.operations.impl;
+
+import com.ignas.iot.operations.Operations;
 
 import java.sql.*;
 
 /**
  * Created by ignas on 4/3/16.
  */
-public class VoltIOT implements IOTOperations {
+public class Postgres implements Operations {
 
     private Connection connection;
 
-    public VoltIOT(Connection connection) {
+    public Postgres(Connection connection) {
         this.connection = connection;
     }
 
     public void insertRawCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
-            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?, ?)}");
+            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?)}");
             callable.setLong(1, patientId);
-            callable.setLong(2, conditionId);
-            callable.setLong(3, bloodPressure);
-            callable.setLong(4, heartRate);
-            callable.setLong(5, bodyTemperature);
+            callable.setLong(2, bloodPressure);
+            callable.setLong(3, heartRate);
+            callable.setLong(4, bodyTemperature);
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to Log patient condition");
         }
     }
 
@@ -39,7 +40,7 @@ public class VoltIOT implements IOTOperations {
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to insert new Patient");
         }
     }
 
@@ -52,36 +53,26 @@ public class VoltIOT implements IOTOperations {
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
         }
     }
 
     public void getLatestViewCondition(long patientId) {
-        CallableStatement callable = null;
-        ResultSet resultSet = null;
-        try {
-            callable = connection.prepareCall("{call FindLatestConditionView(?)}");
-            callable.setLong(1, patientId);
-            resultSet = callable.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+
     }
 
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
-            callable = connection.prepareCall("{call InsertConditionWithStats(?, ?, ?, ?, ?)}");
+            callable = connection.prepareCall("{call InsertConditionStats(?, ?, ?, ?)}");
             callable.setLong(1, patientId);
-            callable.setLong(2, conditionId);
-            callable.setLong(3, bloodPressure);
-            callable.setLong(4, heartRate);
-            callable.setLong(5, bodyTemperature);
+            callable.setLong(2, bloodPressure);
+            callable.setLong(3, heartRate);
+            callable.setLong(4, bodyTemperature);
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to Log patient condition");
         }
     }
 
@@ -89,12 +80,12 @@ public class VoltIOT implements IOTOperations {
         CallableStatement callable = null;
         ResultSet resultSet = null;
         try {
-            callable = connection.prepareCall("{call LatestConditionStats(?)}");
+            callable = connection.prepareCall("{call FindLatestConditionStats(?)}");
             callable.setLong(1, patientId);
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
         }
     }
 
@@ -102,17 +93,17 @@ public class VoltIOT implements IOTOperations {
         CallableStatement callable = null;
         ResultSet resultSet = null;
         try {
-            callable = connection.prepareCall("{call DailyConditionStats}");
+            callable = connection.prepareCall("{call DailyConditionStats()}");
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to get Daily stats:");
         }
     }
 
     public void removeOldData(long maxConditionId) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 14999999");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 120482561");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,6 +116,8 @@ public class VoltIOT implements IOTOperations {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log");
             statement.executeUpdate();
             statement = connection.prepareStatement("DELETE FROM hospital_patient");
+            statement.executeUpdate();
+            statement = connection.prepareStatement("DELETE FROM patient_stats");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

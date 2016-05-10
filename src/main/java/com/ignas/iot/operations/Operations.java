@@ -1,11 +1,11 @@
-package com.ignas.iot;
+package com.ignas.iot.operations;
 
 import java.math.BigDecimal;
 
 /**
- * Basic interface which specifies all posible banking operations
+ * Basic interface which specifies all posible operations with DB layer
  */
-public interface IOTOperations {
+public interface Operations {
 
     // management
     void removeOldData(long maxConditionId);

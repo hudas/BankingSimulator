@@ -1,30 +1,33 @@
-package com.ignas.iot;
+package com.ignas.iot.operations.impl;
+
+import com.ignas.iot.operations.Operations;
 
 import java.sql.*;
 
 /**
  * Created by ignas on 4/3/16.
  */
-public class PostgresIOT implements IOTOperations {
+public class Volt implements Operations {
 
     private Connection connection;
 
-    public PostgresIOT(Connection connection) {
+    public Volt(Connection connection) {
         this.connection = connection;
     }
 
     public void insertRawCondition(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
-            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?)}");
+            callable = connection.prepareCall("{call InsertCondition(?, ?, ?, ?, ?)}");
             callable.setLong(1, patientId);
-            callable.setLong(2, bloodPressure);
-            callable.setLong(3, heartRate);
-            callable.setLong(4, bodyTemperature);
+            callable.setLong(2, conditionId);
+            callable.setLong(3, bloodPressure);
+            callable.setLong(4, heartRate);
+            callable.setLong(5, bodyTemperature);
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to Log patient condition");
+            throw new RuntimeException();
         }
     }
 
@@ -38,7 +41,7 @@ public class PostgresIOT implements IOTOperations {
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to insert new Patient");
+            throw new RuntimeException();
         }
     }
 
@@ -51,26 +54,36 @@ public class PostgresIOT implements IOTOperations {
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
+            throw new RuntimeException();
         }
     }
 
     public void getLatestViewCondition(long patientId) {
-
+        CallableStatement callable = null;
+        ResultSet resultSet = null;
+        try {
+            callable = connection.prepareCall("{call FindLatestConditionView(?)}");
+            callable.setLong(1, patientId);
+            resultSet = callable.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {
-            callable = connection.prepareCall("{call InsertConditionStats(?, ?, ?, ?)}");
+            callable = connection.prepareCall("{call InsertConditionWithStats(?, ?, ?, ?, ?)}");
             callable.setLong(1, patientId);
-            callable.setLong(2, bloodPressure);
-            callable.setLong(3, heartRate);
-            callable.setLong(4, bodyTemperature);
+            callable.setLong(2, conditionId);
+            callable.setLong(3, bloodPressure);
+            callable.setLong(4, heartRate);
+            callable.setLong(5, bodyTemperature);
             callable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to Log patient condition");
+            throw new RuntimeException();
         }
     }
 
@@ -78,12 +91,12 @@ public class PostgresIOT implements IOTOperations {
         CallableStatement callable = null;
         ResultSet resultSet = null;
         try {
-            callable = connection.prepareCall("{call FindLatestConditionStats(?)}");
+            callable = connection.prepareCall("{call LatestConditionStats(?)}");
             callable.setLong(1, patientId);
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to get Latest Condition: " + patientId);
+            throw new RuntimeException();
         }
     }
 
@@ -91,17 +104,17 @@ public class PostgresIOT implements IOTOperations {
         CallableStatement callable = null;
         ResultSet resultSet = null;
         try {
-            callable = connection.prepareCall("{call DailyConditionStats()}");
+            callable = connection.prepareCall("{call DailyConditionStats}");
             resultSet = callable.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to get Daily stats:");
+            throw new RuntimeException();
         }
     }
 
     public void removeOldData(long maxConditionId) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 120482561");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log WHERE log_id > 14999999");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -114,8 +127,6 @@ public class PostgresIOT implements IOTOperations {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM condition_log");
             statement.executeUpdate();
             statement = connection.prepareStatement("DELETE FROM hospital_patient");
-            statement.executeUpdate();
-            statement = connection.prepareStatement("DELETE FROM patient_stats");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

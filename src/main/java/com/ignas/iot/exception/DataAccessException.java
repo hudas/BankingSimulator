@@ -1,4 +1,4 @@
-package com.ignas.iot;
+package com.ignas.iot.exception;
 
 /**
  * Created by ignas on 4/3/16.

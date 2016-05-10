@@ -1,7 +1,7 @@
-package com.ignas.iot;
+package com.ignas.iot.operations.impl;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.ignas.iot.operations.Operations;
 import com.mongodb.MongoClient;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
@@ -17,11 +17,11 @@ import java.util.Date;
 /**
  * Created by ignas on 4/3/16.
  */
-class MongoIOT implements IOTOperations {
+public class Mongo implements Operations {
 
     private MongoDatabase db;
 
-    public MongoIOT() {
+    public Mongo() {
         MongoClient mongoClient = new MongoClient();
         db = mongoClient.getDatabase("iot_simulation");
     }
