@@ -1,5 +1,6 @@
 package com.ignas.iot.configuration;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,16 +11,27 @@ import java.util.Properties;
  */
 public class PropertiesFileReader implements ProvidesConfig {
 
-    public static SimulationConfig loadProperties() {
+    private String filePath;
+
+    public PropertiesFileReader(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public SimulationConfig loadProperties() {
         Properties prop = new Properties();
         InputStream input = null;
 
         try {
-            input = new FileInputStream("config.properties");
+            File propsFile = new File("config.properties");
+            if (filePath != null && !filePath.isEmpty()) {
+                propsFile = new File(filePath);
+            }
+
+            System.out.println("Loading config from: " + propsFile.getAbsolutePath());
+            input = new FileInputStream(propsFile);
 
             // load a properties file
             prop.load(input);
-
             Integer patientsCount = Integer.parseInt(prop.getProperty("patients.count"));
             Integer preparedConditionsCount = Integer.parseInt(prop.getProperty("prepared_conditions.count"));
 
@@ -33,8 +45,10 @@ public class PropertiesFileReader implements ProvidesConfig {
             Integer dailyCondStatFreq = Integer.parseInt(prop.getProperty("daily_condition_stats.freq"));
             Integer findLatestFromViewFreq = Integer.parseInt(prop.getProperty("find_latest_view.freq"));
 
+            Long intervalMilis = Long.parseLong(prop.getProperty("work_interval.milis"));
+
             SimulationConfig config = new SimulationConfig(patientsCount, preparedConditionsCount,
-                    threadCount, workIterations,
+                    threadCount, workIterations, intervalMilis,
                     insertCondFreq, findLatestFreq, insertCondStatFreq, findLatestStatFreq,
                     dailyCondStatFreq, findLatestFromViewFreq);
 

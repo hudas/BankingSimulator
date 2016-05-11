@@ -20,28 +20,32 @@ public class Application {
         }
 
         String dbName = args[0];
-        OperationsFactory ops = getConnectionProvider(dbName);
+        String hostName = args[1];
+        OperationsFactory ops = getConnectionProvider(dbName, hostName);
         if (ops == null) {
             throw new RuntimeException("Neegzistuojanti DB! Galimos: (volt, mongo, postgres)");
         }
 
-        Simulation simulation = new Simulation(ops, new PropertiesFileReader().getConfiguration(), 0);
+        System.out.println("DAFUQ");
+
+        String propPath = args[3];
+        Simulation simulation = new Simulation(ops, new PropertiesFileReader(propPath).getConfiguration(), 0);
 
 
-        if (args.length == 2 && args[1] != null && "def".equals(args[1].toLowerCase())) {
+        if (args.length == 3 && args[2] != null && "def".equals(args[2].toLowerCase())) {
             simulation.define();
         } else {
             simulation.run();
         }
     }
 
-    private static OperationsFactory getConnectionProvider(String dbName) {
+    private static OperationsFactory getConnectionProvider(String dbName, String host) {
         if (dbName.equals("volt")) {
-            return volt();
+            return volt(host);
         } else if (dbName.equals("mongo")) {
-            return mongo();
+            return mongo(host);
         } else if (dbName.equals("postgres")) {
-            return postgres();
+            return postgres(host);
         }
 
         return null;

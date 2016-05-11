@@ -54,10 +54,11 @@ public class Simulation {
 
 
     public void run() throws SQLException {
-        prepareForRun();
+        //prepareForRun();
 
         start = System.currentTimeMillis();
-        System.out.println("Starting Simulation on Threads: " + config.getThreadCount() + " ON: " + start);
+        System.out.println("Starting NEW Simulation on Threads: " + config.getThreadCount() + " ON: " + start);
+        System.out.println("Iterations: " + config.getWorkIterations() + " ON: " + start);
         for (int i = 0; i < config.getThreadCount(); i++) {
             new Thread(
                     new ThreadedSimulation(
@@ -66,7 +67,8 @@ public class Simulation {
                                     connectionProvider.getOperations(),
                                     config.getPatientCount(),
                                     new Long(config.getPredefinedConditions())
-                            )
+                            ),
+                            config.getIntervalMilis()
                     )
             ).start();
         }
@@ -86,14 +88,17 @@ public class Simulation {
 
         private OperationService service;
         private Integer threadNum;
+        private Long simulationTime;
 
-        public ThreadedSimulation(Integer threadNum, OperationService service) {
+        public ThreadedSimulation(Integer threadNum, OperationService service, Long simulationTime) {
             this.threadNum = threadNum;
             this.service = service;
+            this.simulationTime = simulationTime;
         }
 
         public void run() {
             Long count = 0L;
+
             for (int i = 0; i < config.getWorkIterations(); i++) {
 
                 for(int j = 0; j < config.getInsertCondFreq(); j++) {
@@ -118,6 +123,12 @@ public class Simulation {
 
                 for(int j = 0; j < config.getDailyCondStatsFreq(); j++) {
                     service.getDailyConditionStats();
+                }
+
+                long currentTime = System.currentTimeMillis();
+                if (simulationTime > 0 && currentTime - start > simulationTime) {
+                    System.out.println("Breaking time!");
+                    break;
                 }
             }
 

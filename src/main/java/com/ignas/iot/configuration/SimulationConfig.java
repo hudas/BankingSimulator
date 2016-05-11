@@ -11,6 +11,7 @@ public class SimulationConfig {
 
     private Integer threadCount = 5;
     private Integer workIterations = 1;
+    private Long intervalMilis = 0L;
 
     // Must Be 100proc
     private Integer insertCondFreq = 100;
@@ -21,13 +22,15 @@ public class SimulationConfig {
     private Integer findLatestFromViewFreq = 0;
 
     public SimulationConfig(Integer patientCount, Integer predefinedConditions,
-                            Integer threadCount, Integer workIterations, Integer insertCondFreq,
+                            Integer threadCount, Integer workIterations, Long intervalMilis,
+                            Integer insertCondFreq,
                             Integer findLatestFreq, Integer insertCondWithStatsFreq, Integer findLatestStatFreq,
                             Integer dailyCondStatsFreq, Integer findLatestFromViewFreq) {
         this.patientCount = patientCount;
         this.predefinedConditions = predefinedConditions;
         this.threadCount = threadCount;
         this.workIterations = workIterations;
+        this.intervalMilis = intervalMilis;
         this.insertCondFreq = insertCondFreq;
         this.findLatestFreq = findLatestFreq;
         this.insertCondWithStatsFreq = insertCondWithStatsFreq;
@@ -74,5 +77,9 @@ public class SimulationConfig {
 
     public Integer getFindLatestFromViewFreq() {
         return findLatestFromViewFreq;
+    }
+
+    public Long getIntervalMilis() {
+        return intervalMilis;
     }
 }

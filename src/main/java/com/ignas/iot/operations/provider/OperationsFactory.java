@@ -13,18 +13,21 @@ public class OperationsFactory {
 
     private ProvidesOperation provider;
     private static Operations voltConnection;
+    private static Operations voltConnection1;
+    private static Operations voltConnection2;
+    private static int issuedConnections;
 
     private OperationsFactory(ProvidesOperation opsProvider) {
         provider = opsProvider;
     }
 
-    public static OperationsFactory postgres() {
+    public static OperationsFactory postgres(String host) {
         return new OperationsFactory(() -> {
             Connection connection;
 
             try {
                 Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/simulation_data", "postgres", "postgres");
+                connection = DriverManager.getConnection("jdbc:postgresql://" + host + ":5432/simulation_data", "postgres", "postgres");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -35,25 +38,38 @@ public class OperationsFactory {
         });
     }
 
-    public static OperationsFactory volt() {
+    public static OperationsFactory volt(String host) {
         Connection connection;
 
+//        voltConnection = getColtCon(host, "7002");
+//        voltConnection1 = getColtCon(host, "8002");
+
+        return new OperationsFactory(() -> {
+            issuedConnections++;
+            if (issuedConnections % 2 == 0) {
+                return getColtCon(host, "7002");
+            } else  {
+                return getColtCon(host, "8002");
+            }
+        });
+    }
+
+    private static Operations getColtCon(String host, String port) {
+        Connection connection;
         try {
             Class.forName("org.voltdb.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:voltdb://localhost:7002");
+            connection = DriverManager.getConnection("jdbc:voltdb://" + host + ":" + port);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             return null;
         }
 
-        voltConnection = new Volt(connection);
-        return new OperationsFactory(() ->
-            voltConnection
-        );
+
+        return new Volt(connection);
     }
 
-    public static OperationsFactory mongo() {
+    public static OperationsFactory mongo(String host) {
         return new OperationsFactory(() -> new Mongo());
     }
 
