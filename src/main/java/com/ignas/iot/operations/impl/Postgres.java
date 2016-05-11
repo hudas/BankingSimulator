@@ -61,6 +61,11 @@ public class Postgres implements Operations {
 
     }
 
+    @Override
+    public void fastDelete(long patientId) {
+
+    }
+
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         CallableStatement callable = null;
         try {

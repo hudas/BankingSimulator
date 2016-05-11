@@ -43,6 +43,11 @@ CREATE TABLE patient_stats (
 
 PARTITION TABLE patient_stats ON COLUMN PATIENT_ID;
 
+CREATE PROCEDURE FastDelete
+AS DELETE FROM condition_log WHERE patient_id = ? and log_id > 10000000;
+
+PARTITION PROCEDURE FastDelete ON TABLE condition_log COLUMN PATIENT_ID;
+
 -- VIEW:
 CREATE VIEW LATEST_MEASUREMENT (
       PATIENT_ID,

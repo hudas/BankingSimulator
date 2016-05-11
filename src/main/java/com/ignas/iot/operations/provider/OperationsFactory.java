@@ -44,18 +44,17 @@ public class OperationsFactory {
     public static OperationsFactory volt(String host) {
         Connection connection;
 
-//        voltConnection = getColtCon(host, "7002");
-//        voltConnection1 = getColtCon(host, "8002");
-
-
         return new OperationsFactory(() -> {
             Random random = new Random();
             random.setSeed(System.currentTimeMillis());
 
-            if (random.nextBoolean()) {
+            Integer server = random.nextInt();
+            if (server % 3 == 0) {
                 return getColtCon(host, "7002");
-            } else  {
+            } else if (server % 3 == 1) {
                 return getColtCon(host, "8002");
+            } else {
+                return getColtCon(host, "9002");
             }
         });
     }

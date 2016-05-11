@@ -59,6 +59,11 @@ public class Mongo implements Operations {
 
     }
 
+    @Override
+    public void fastDelete(long patientId) {
+
+    }
+
     public void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature) {
         MongoCollection collection = db.getCollection("condition_log");
         Document document = new Document();

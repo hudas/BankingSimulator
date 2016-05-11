@@ -72,6 +72,10 @@ public class OperationService {
         operations.getDailyConditionStats();
     }
 
+    public void fastDelete(Integer patientId) {
+        operations.fastDelete(patientId);
+    }
+
     public void removeOldData(long preparedCondCount) {
         operations.removeOldData(preparedCondCount);
     }

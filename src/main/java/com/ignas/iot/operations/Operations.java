@@ -18,6 +18,7 @@ public interface Operations {
     void getLatestViewCondition(long patientId);
 
     // Second
+    void fastDelete(long patientId);
     void insertConditionWithStats(long patientId, long conditionId, long bloodPressure, long heartRate, long bodyTemperature);
     void getLatestConditionStats(long patientId);
     void getDailyConditionStats();

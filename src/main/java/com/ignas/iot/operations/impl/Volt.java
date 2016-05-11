@@ -100,6 +100,19 @@ public class Volt implements Operations {
         }
     }
 
+    public void fastDelete(long patientId) {
+        CallableStatement callable = null;
+        ResultSet resultSet = null;
+        try {
+            callable = connection.prepareCall("{call FastDelete(?)}");
+            callable.setLong(1, patientId);
+            resultSet = callable.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
     public void getDailyConditionStats() {
         CallableStatement callable = null;
         ResultSet resultSet = null;

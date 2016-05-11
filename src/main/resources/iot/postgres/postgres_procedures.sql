@@ -56,6 +56,9 @@ BEGIN
     RETURN FALSE;
   END IF;
 
+  INSERT INTO condition_log (patient_id, log_id, measurement_time, blood_pressure, heart_rate, body_temperature)
+  VALUES (in_patient_id, nextval('condition_log_id_seq'), now(), in_blood_pressure, in_heart_rate, in_body_temperature);
+
   SELECT tmp_pressure_sum, pressure_min, pressure_max,
     tmp_rate_sum, rate_min, rate_max,
     tmp_temp_sum, temp_min, temp_max,
