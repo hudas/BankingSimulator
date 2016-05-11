@@ -26,10 +26,7 @@ public class Application {
             throw new RuntimeException("Neegzistuojanti DB! Galimos: (volt, mongo, postgres)");
         }
 
-        System.out.println("DAFUQ");
-
-        String propPath = args[3];
-        Simulation simulation = new Simulation(ops, new PropertiesFileReader(propPath).getConfiguration(), 0);
+        Simulation simulation = new Simulation(ops, new PropertiesFileReader().getConfiguration(), 0);
 
 
         if (args.length == 3 && args[2] != null && "def".equals(args[2].toLowerCase())) {

@@ -11,10 +11,7 @@ import java.util.Properties;
  */
 public class PropertiesFileReader implements ProvidesConfig {
 
-    private String filePath;
-
-    public PropertiesFileReader(String filePath) {
-        this.filePath = filePath;
+    public PropertiesFileReader() {
     }
 
     public SimulationConfig loadProperties() {
@@ -23,9 +20,6 @@ public class PropertiesFileReader implements ProvidesConfig {
 
         try {
             File propsFile = new File("config.properties");
-            if (filePath != null && !filePath.isEmpty()) {
-                propsFile = new File(filePath);
-            }
 
             System.out.println("Loading config from: " + propsFile.getAbsolutePath());
             input = new FileInputStream(propsFile);

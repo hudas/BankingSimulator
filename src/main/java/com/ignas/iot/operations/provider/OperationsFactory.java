@@ -7,6 +7,8 @@ import com.ignas.iot.operations.impl.Postgres;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.*;
+
 
 
 public class OperationsFactory {
@@ -15,7 +17,8 @@ public class OperationsFactory {
     private static Operations voltConnection;
     private static Operations voltConnection1;
     private static Operations voltConnection2;
-    private static int issuedConnections;
+    private static volatile int issuedConnections;
+
 
     private OperationsFactory(ProvidesOperation opsProvider) {
         provider = opsProvider;
@@ -44,9 +47,12 @@ public class OperationsFactory {
 //        voltConnection = getColtCon(host, "7002");
 //        voltConnection1 = getColtCon(host, "8002");
 
+
         return new OperationsFactory(() -> {
-            issuedConnections++;
-            if (issuedConnections % 2 == 0) {
+            Random random = new Random();
+            random.setSeed(System.currentTimeMillis());
+
+            if (random.nextBoolean()) {
                 return getColtCon(host, "7002");
             } else  {
                 return getColtCon(host, "8002");
