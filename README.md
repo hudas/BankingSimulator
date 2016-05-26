@@ -21,3 +21,8 @@ Paskirtis:
 Naudojantis šiuo simuliatoriumi atlikti pralaidumo matavimai.
 Pradėjus simuliacija praneša apie darbo pradžią, ir darbo pabaigą.
 Iš to sužinome laiką per kurį buvo atliktas iš anksto apsibrėžtas operacijų kiekis.
+
+
+Reikalavimai:
+* PostgreSQL, MongoDB, VoltDB serveriai;
+* JAVA 8
