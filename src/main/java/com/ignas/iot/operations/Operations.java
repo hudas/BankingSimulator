@@ -3,7 +3,7 @@ package com.ignas.iot.operations;
 import java.math.BigDecimal;
 
 /**
- * Basic interface which specifies all posible operations with DB layer
+ * Basic layer of Business Operations
  */
 public interface Operations {
 

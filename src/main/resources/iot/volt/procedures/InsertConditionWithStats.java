@@ -7,9 +7,6 @@ import org.voltdb.VoltTableRow;
 
 import java.sql.ResultSet;
 
-/**
- * Created by ignas on 5/4/16.
- */
 public class InsertConditionWithStats extends VoltProcedure {
     public final SQLStmt insertCondition = new SQLStmt(
             "INSERT INTO condition_log(patient_id, log_id, measurement_time, blood_pressure, heart_rate, body_temperature)" +

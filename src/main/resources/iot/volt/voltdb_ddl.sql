@@ -1,3 +1,5 @@
+-- VoltDB Schema Definition
+
 CREATE TABLE CONDITION_LOG (
    PATIENT_ID bigint NOT NULL,
    LOG_ID bigint NOT NULL,

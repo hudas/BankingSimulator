@@ -4,9 +4,6 @@ import org.voltdb.SQLStmt;
 import org.voltdb.VoltProcedure;
 import org.voltdb.VoltTable;
 
-/**
- * Created by ignas on 5/4/16.
- */
 public class LatestConditionStats extends VoltProcedure {
 
     public final SQLStmt findLatestCondition = new SQLStmt(

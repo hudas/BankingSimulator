@@ -1,10 +1,6 @@
 package com.ignas.iot.configuration;
 
-import com.j256.ormlite.stmt.query.In;
 
-/**
- * Created by ignas on 5/10/16.
- */
 public class SimulationConfig {
     private Integer patientCount = 100;
     private Integer predefinedConditions = 1000000;

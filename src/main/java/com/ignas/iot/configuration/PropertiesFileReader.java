@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Created by ignas on 5/10/16.
- */
+
 public class PropertiesFileReader implements ProvidesConfig {
 
     public PropertiesFileReader() {

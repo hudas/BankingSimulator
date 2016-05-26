@@ -10,9 +10,11 @@ import static com.ignas.iot.operations.provider.OperationsFactory.mongo;
 import static com.ignas.iot.operations.provider.OperationsFactory.postgres;
 import static com.ignas.iot.operations.provider.OperationsFactory.volt;
 
+
+/**
+ * Main Entry point of application
+ */
 public class Application {
-
-
 
     public static void main(String... args) throws SQLException {
         if (args.length < 1) {
